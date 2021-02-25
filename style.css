@@ -16,13 +16,13 @@ a {
 }
 
 #board {
-    width: min(500px, 100vmin);
-    height: min(500px, 100vmin);
+    width: min(700px, 100vmin);
+    height: min(600px, 100vmin);
     font-size: min(100px, 20vmin);
     background-color: rgb(151, 167, 184);
     border: 1px solid white;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     gap: 2px;
     box-shadow: inset 0 0 0px 1px #fff;
 }

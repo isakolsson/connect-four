@@ -1,4 +1,4 @@
-const boardArray = new Array(9).fill(null);
+const boardArray = new Array(42).fill(null);
 const boardElement = document.querySelector("#board");
 const information = document.querySelector("#information");
 const computerInformation = document.querySelector("#computer-information");
@@ -34,14 +34,14 @@ function startGame() {
 
 function newRound() {
     if (checkForWinner(boardArray) !== null) {
-        if (checkForWinner === "x") {
+        if (checkForWinner(boardArray) === "x") {
             information.innerText = "you won";
         } else {
             information.innerText = "the computer won";
         }
         return;
     }
-    if (round === 9) {
+    if (round === 42) {
         information.innerText = "game ended with a draw";
         return;
     }
@@ -60,10 +60,11 @@ function newRoundPlayer() {
 }
 
 Array.from(boardElement.getElementsByClassName("square")).forEach((squareElement, i) => {
+    squareElement.innerHTML = '<span style="font-size:30px">' + i + '</span>';//TABORT
     squareElement.onclick = () => {
         if (boardArray[i] === null && boardElement.classList.contains("players-turn")) {
             boardElement.classList.remove("players-turn");
-            placePiece(true, i);
+            placePiece(true, findLowestEmptySquare(boardArray, i%7));
         }
     }
 })
@@ -79,38 +80,47 @@ function placePiece(isPlayer, squareIndex) {
     newRound();
 }
 
+function findLowestEmptySquare(board, column) {
+    for (let i = 35+column; i >= 0; i-=7) {
+        if (board[i] == null) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 function checkForWinner(board) {
-    for (i = 0; i < 9; i+=3) {
-        const value = board[i];
-        // console.log("a");
-        if (value !== null) {
-            // console.log("b");
-            if (value === board[i+1] && value === board[i+2]) {
-                // console.log("c");
-                return value;
+    let winner = null;
+    board.forEach((square, i) => {
+        if (square != null) {
+            if (i < 21) {
+                if (square == board[i+7] && square == board[i+14] && square == board[i+21]) {
+                    // console.log(i + " vertical " + square);
+                    winner = square;
+                }
+            }
+            if (i%7 < 4) {
+                if (square == board[i+1] && square == board[i+2] && square == board[i+3]) {
+                    // console.log(i + " horizontal " + square);
+                    winner = square;
+                }
+            }
+            if (i < 21 && i%7 < 4) {
+                if (square == board[i+8] && square == board[i+16] && square == board[i+24]) {
+                    // console.log(i + " alpha " + square);
+                    winner = square;
+                }
+            } else if (i%7 < 4) {
+                if (square == board[i-6] && square == board[i-12] && square == board[i-18]) {
+                    // console.log(i + " beta " + square);
+                    winner = square;
+                }
             }
         }
-    }
-    for (i = 0; i < 3; i++) {
-        const value = board[i];
-        // console.log("1");
-        if (value !== null) {
-            // console.log("2");
-            if (value === board[i+3] && value === board[i+6]) {
-                // console.log("3");
-                return value;
-            }
-        }
-    }
-    if (board[0] !== null && board[0] === board[4] && board[0] === board[8]) {
-        // console.log("alpha");
-        return board[0];
-    }
-    if (board[2] !== null && board[2] === board[4] && board[2] === board[6]) {
-        // console.log("beta");
-        return board[2];
-    }
-    return null;
+        
+    });
+
+    return winner;
 }
 
 function newRoundComputer() {
@@ -120,7 +130,8 @@ function newRoundComputer() {
     let i = 0;
     interval = window.setInterval(() => {
         const board = possibleMoves(boardArray, "o")[i];
-        const value = minimax(board, 9-round, false);
+        // const value = minimax(board, 9-round, false);
+        const value = minimax(board, 7, false);
         if (value > best || bestIndex === -1) {
             bestIndex = findDifferenceIndexBetweenTwoBoards(boardArray, board);
             best = value;
@@ -147,16 +158,16 @@ function newRoundComputer() {
                     computerInformation.innerText = "";
                 });
                 placePiece(false, bestIndex);
-            }, 3*(Math.pow(-5*round, 2) + 45*round));
+            }, 3*(Math.pow(-2*round, 2) + 2*round));
             
         }
-    }, Math.pow(-5*round, 2) + 45*round);
+    }, Math.pow(-2*round, 2) + 2*round);
 }
 
 
 
 function findDifferenceIndexBetweenTwoBoards(board1, board2) {
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 42; i++) {
         if (board1[i] !== board2[i]) {
             return i;
         }
@@ -189,10 +200,12 @@ function minimax(node, depth, maximizingPlayer) {
 
 function possibleMoves(board, piece) {
     const possibleMoves = new Array();
-    board.forEach((square, i) => {
-        if (square === null) {
-            possibleMoves.push(board.map((x, j) => j === i ? piece : x));
+    for (let i = 0; i < 7; i++) {
+        if (findLowestEmptySquare(board, i) != -1) {
+            const copy = board.map(x=>x);
+            copy[findLowestEmptySquare(board, i)] = piece;
+            possibleMoves.push(copy);
         }
-    });
+    }
     return possibleMoves;
 }
