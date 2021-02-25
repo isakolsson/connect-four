@@ -1,0 +1,75 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-align: center;
+}
+
+a {
+    color: inherit;
+}
+
+#board {
+    width: min(500px, 100vmin);
+    height: min(500px, 100vmin);
+    font-size: min(100px, 20vmin);
+    background-color: rgb(151, 167, 184);
+    border: 1px solid white;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    box-shadow: inset 0 0 0px 1px #fff;
+}
+.square {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.square::before {
+    position: absolute;
+    font-size: inherit;
+}
+.square.x::before {
+    content: "×";
+}
+.square.o::before {
+    content: "○";
+}
+/* .square:not(.o):not(.x)::before {
+    content: "w";
+} */
+.square.green {
+    background-color: rgb(81, 255, 65);
+}
+.square.red {
+    background-color: rgb(255, 78, 78);
+}
+.square.yellow {
+    background-color: rgb(255, 252, 97);
+}
+
+#board.players-turn .square {
+    cursor: pointer;
+}
+
+p {
+    margin: 10px 0;
+}
+#information {
+    font-size: 30px;
+    font-weight: bold;
+}
+#computer-information {
+    font-size: 20px;
+}
+#restart {
+    text-decoration: underline;
+    cursor: pointer;
+}
