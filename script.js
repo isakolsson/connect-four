@@ -130,8 +130,8 @@ function newRoundComputer() {
     let i = 0;
     interval = window.setInterval(() => {
         const board = possibleMoves(boardArray, "o")[i];
-        // const value = minimax(board, 9-round, false);
-        const value = minimax(board, 7, false);
+        // const value = minimax(board, 7, false);
+        const value = alphabeta(board, 10, -1, 1, false);
         if (value > best || bestIndex === -1) {
             bestIndex = findDifferenceIndexBetweenTwoBoards(boardArray, board);
             best = value;
@@ -158,10 +158,10 @@ function newRoundComputer() {
                     computerInformation.innerText = "";
                 });
                 placePiece(false, bestIndex);
-            }, 3*(Math.pow(-2*round, 2) + 2*round));
+            }, 50);
             
         }
-    }, Math.pow(-2*round, 2) + 2*round);
+    }, 100);
 }
 
 
@@ -175,9 +175,31 @@ function findDifferenceIndexBetweenTwoBoards(board1, board2) {
     return -1;
 }
 
-function minimax(node, depth, maximizingPlayer) {
-    // console.count();
-    if (depth === 0 || checkForWinner(node)) {
+// function minimax(node, depth, maximizingPlayer) {
+//     // console.count();
+//     if (depth === 0 || checkForWinner(node) !== null) {//?
+//         const winner = checkForWinner(node);
+//         if (winner === "o") {
+//             return 1;
+//         } else if (winner === "x") {
+//             return -1;
+//         } else {
+//             return 0;
+//         }
+//     }
+//     if (maximizingPlayer) {
+//         let value = -1;
+//         possibleMoves(node, "o").forEach(child => value = Math.max(value, minimax(child, depth-1, false)));
+//         return value;
+//     } else {
+//         let value = 1;
+//         possibleMoves(node, "x").forEach(child => value = Math.min(value, minimax(child, depth-1, true)));
+//         return value;
+//     }
+// }
+
+function alphabeta(node, depth, alpha, beta, maximizingPlayer) {
+    if (depth === 0 || checkForWinner(node) !== null) {
         const winner = checkForWinner(node);
         if (winner === "o") {
             return 1;
@@ -189,11 +211,21 @@ function minimax(node, depth, maximizingPlayer) {
     }
     if (maximizingPlayer) {
         let value = -1;
-        possibleMoves(node, "o").forEach(child => value = Math.max(value, minimax(child, depth-1, false)));
+        possibleMoves(node, "o").some(child => {
+            value = Math.max(value, alphabeta(child, depth-1, alpha, beta, false));
+            alpha = Math.max(alpha,value);
+            return alpha >= beta;
+        });
+        // console.log(alpha >= beta);
         return value;
     } else {
         let value = 1;
-        possibleMoves(node, "x").forEach(child => value = Math.min(value, minimax(child, depth-1, true)));
+        // possibleMoves(node, "x").forEach(child => value = Math.min(value, minimax(child, depth-1, true)));
+        possibleMoves(node, "x").some(child => {
+            value = Math.min(value, alphabeta(child, depth-1, alpha, beta, true));
+            beta = Math.min(beta,value);
+            return beta <= alpha;
+        });
         return value;
     }
 }
