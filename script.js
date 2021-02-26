@@ -6,6 +6,7 @@ const restart = document.querySelector("#restart");
 
 let round = 0;
 let playerGetFirstTurn = false;
+let roundsToForesee = 11;
 let interval, timeout;
 
 window.onload = () => {
@@ -14,6 +15,20 @@ window.onload = () => {
 
 restart.onclick = () => {
     startGame();
+}
+
+document.getElementById("round-minus").onclick = () => {
+    if (roundsToForesee > 1) {
+        roundsToForesee--;
+        document.getElementById("round-number").innerText = roundsToForesee;
+    }
+}
+
+document.getElementById("round-plus").onclick = () => {
+    if (roundsToForesee < 11) {
+        roundsToForesee++;
+        document.getElementById("round-number").innerText = roundsToForesee;
+    }
 }
 
 function startGame() {
@@ -60,9 +75,9 @@ function newRoundPlayer() {
 }
 
 Array.from(boardElement.getElementsByClassName("square")).forEach((squareElement, i) => {
-    squareElement.innerHTML = '<span style="font-size:30px">' + i + '</span>';//TABORT
+    // squareElement.innerHTML = '<span style="font-size:30px">' + i + '</span>';//TABORT
     squareElement.onclick = () => {
-        if (boardArray[i] === null && boardElement.classList.contains("players-turn")) {
+        if (findLowestEmptySquare(boardArray, i%7) !== -1 && boardElement.classList.contains("players-turn")) {
             boardElement.classList.remove("players-turn");
             placePiece(true, findLowestEmptySquare(boardArray, i%7));
         }
@@ -131,7 +146,7 @@ function newRoundComputer() {
     interval = window.setInterval(() => {
         const board = possibleMoves(boardArray, "o")[i];
         // const value = minimax(board, 7, false);
-        const value = alphabeta(board, 10, -1, 1, false);
+        const value = alphabeta(board, roundsToForesee-1, -1, 1, false);
         if (value > best || bestIndex === -1) {
             bestIndex = findDifferenceIndexBetweenTwoBoards(boardArray, board);
             best = value;
@@ -216,11 +231,9 @@ function alphabeta(node, depth, alpha, beta, maximizingPlayer) {
             alpha = Math.max(alpha,value);
             return alpha >= beta;
         });
-        // console.log(alpha >= beta);
         return value;
     } else {
         let value = 1;
-        // possibleMoves(node, "x").forEach(child => value = Math.min(value, minimax(child, depth-1, true)));
         possibleMoves(node, "x").some(child => {
             value = Math.min(value, alphabeta(child, depth-1, alpha, beta, true));
             beta = Math.min(beta,value);

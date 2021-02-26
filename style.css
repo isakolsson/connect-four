@@ -69,6 +69,10 @@ p {
 #computer-information {
     font-size: 20px;
 }
+#round-minus, #round-plus {
+    padding: 0 5px;
+    cursor: pointer;
+}
 #restart {
     text-decoration: underline;
     cursor: pointer;
